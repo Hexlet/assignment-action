@@ -12,7 +12,7 @@ import colors from 'ansi-colors';
 
 export const buildErrorText = (e) => {
   const stack = new StackTracey(e);
-  const message = e.message;
+  const { message } = e;
   const traceLine = _.head(stack.items).beforeParse;
   return `${message}\n${traceLine}`;
 };
@@ -74,8 +74,8 @@ export const runTests = async (params) => {
     return;
   }
 
-  // запрос на апи: проверка возможности тестирования, получение версии образа 
-  const imageName = `hexletprograms/hexlet-course-source-ci:release`;
+  // запрос на апи: проверка возможности тестирования, получение версии образа
+  const imageName = 'hexletprograms/hexlet-course-source-ci:release';
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
   await checkAssignment({ assignmentPath, coursePath });
