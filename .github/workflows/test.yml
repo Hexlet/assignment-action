@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: make setup
+      # - run: make setup
       # - run: node server.js &
       - uses: ./
         # env:
