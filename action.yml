@@ -1,0 +1,20 @@
+name: 'Hexlet assignment action'
+description: 'For testing assignments'
+
+inputs:
+  # hexlet-id:
+  #   description: 'id'
+  #   required: true
+  verbose:
+    description: 'show extended output'
+    required: false
+    default: false
+  mount_path:
+    description: 'mount path'
+    required: true
+    default: "/var/tmp"
+
+runs:
+  using: 'node16'
+  main: 'dist/run-tests/index.js'
+  # post: 'dist/run-post-actions/index.js'

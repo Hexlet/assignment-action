@@ -8,7 +8,7 @@ build:
 	npm run build
 
 test:
-	npx jest
+	ACTIONS_STEP_DEBUG=true npx jest
 
 lint:
 	npx eslint .
