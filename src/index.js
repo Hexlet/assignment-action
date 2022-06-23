@@ -2,7 +2,7 @@
 
 import core from '@actions/core';
 import io from '@actions/io';
-import exec from '@actions/exec';
+import { exec } from '@actions/exec';
 import path from 'path';
 import fse from 'fs-extra';
 import fs from 'fs';
@@ -21,17 +21,17 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   const cmdOptions = { silent: !verbose };
 
   await io.mkdirP(coursePath);
-  await exec.exec(`docker pull ${imageName}`, null, cmdOptions);
-  await exec.exec(
+  await exec(`docker pull ${imageName}`, null, cmdOptions);
+  await exec(
     `docker run -v ${coursePath}:/mnt/course ${imageName} bash -c "cp -r /course/. /mnt/course"`,
     null,
     cmdOptions,
   );
 
   const composeImageName = `${path.basename(coursePath)}_course`;
-  await exec.exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
+  await exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
 
-  await exec.exec(
+  await exec(
     `docker compose -f docker-compose.yml run -v ${coursePath}:/course course make setup`,
     null,
     { cwd: coursePath },
@@ -47,7 +47,7 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
   const assignmentDistPath = path.join('/', 'course', lessonName, 'assignment');
 
   core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
-  await exec.exec(
+  await exec(
     `docker compose -f docker-compose.yml run -v ${assignmentPath}:${assignmentDistPath} course make check-current ASSIGNMENT=${lessonName}`,
     null,
     { cwd: coursePath },

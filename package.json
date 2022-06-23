@@ -10,6 +10,11 @@
     "build": "npm run build-run-tests && npm run build-run-post-actions",
     "test": "jest --colors"
   },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/tmp"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hexlet/assignment-action.git"
