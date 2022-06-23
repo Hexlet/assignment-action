@@ -8,7 +8,7 @@
     "build-run-tests": "ncc build bin/run-tests.js -o dist/run-tests -m --source-map",
     "build-run-post-actions": "ncc build src/bin/run-post-actions.js -o dist/run-post-actions -m --source-map",
     "build": "npm run build-run-tests && npm run build-run-post-actions",
-    "test": "jest --colors"
+    "test": "jest --colors --runInBand"
   },
   "jest": {
     "modulePathIgnorePatterns": [
