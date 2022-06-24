@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: make setup
-      - run: make run-test-api-server &
+      - run: make run-test-api-server && sleep 5
       - uses: ./
         env:
           ACTION_API_HOST: http://localhost:3000
