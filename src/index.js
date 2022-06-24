@@ -54,7 +54,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   await exec(
     `docker compose -f docker-compose.yml run -v ${coursePath}:/course course make setup`,
     null,
-    { cwd: coursePath },
+    { ...cmdOptions, cwd: coursePath },
   );
 };
 
