@@ -136,7 +136,6 @@ export const runTests = async (params) => {
 export const runPostActions = async ({ hexletToken }) => {
   const checkCreatePath = core.getState('checkCreatePath');
   const checkState = core.getState('checkState');
-  console.log(checkState);
 
   if (_.isEmpty(checkCreatePath)) {
     return;
@@ -152,5 +151,5 @@ export const runPostActions = async ({ hexletToken }) => {
     throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
   }
 
-  core.info('The result of the assignment checking was successfully submitted.');
+  core.info(colors.cyan('The result of the assignment checking was successfully submitted.'));
 };
