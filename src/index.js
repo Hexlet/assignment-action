@@ -70,8 +70,9 @@ export const runTests = async (params) => {
   const assignmentPath = path.join(projectPath, assignmentRelativePath);
 
   if (!fs.existsSync(assignmentPath)) {
-    // ошибка с понятным текстом, что нет домашки в репе
-    return;
+    // NOTE: Кейс с ручным неправильным изменением .current.json
+    // Так как путь к проверяемому ДЗ формирует утилита при сабмите.
+    throw new Error(`Assignment by path ${assignmentRelativePath} not found. Check if the path is correct.`);
   }
 
   // запрос на апи: проверка возможности тестирования, получение версии образа

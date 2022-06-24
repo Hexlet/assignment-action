@@ -60,3 +60,11 @@ it('run-tests assignment with wrong solution', async () => {
 
   await expect(runTests()).rejects.toThrow();
 }, 50000);
+
+it('run-tests assignment with incorrect path in .current.json', async () => {
+  await fse.writeJSON(currentDataPath, {
+    assignment: 'wrong-course/wrong-assignment',
+  });
+
+  await expect(runTests()).rejects.toThrow();
+}, 50000);
