@@ -124,19 +124,21 @@ export const runTests = async (params) => {
   const imageTag = _.get(response, 'result.version');
   const imageName = `hexletprograms/${courseSlugWithLocale}:${imageTag}`;
 
-  core.exportVariable('checkCreatePath', routes.checkCreatePath);
-  core.exportVariable('checkState', JSON.stringify({ state: 'fail' }));
+  core.saveState('checkCreatePath', routes.checkCreatePath);
+  core.saveState('checkState', JSON.stringify({ state: 'fail' }));
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
   await checkAssignment({ assignmentPath, coursePath });
 
-  core.exportVariable('checkState', JSON.stringify({ state: 'success' }));
+  core.saveState('checkState', JSON.stringify({ state: 'success' }));
 };
 
 export const runPostActions = async ({ hexletToken }) => {
-  const { checkCreatePath, checkState } = process.env;
+  const checkCreatePath = core.getState('checkCreatePath');
+  const checkState = core.getState('checkState');
+  console.log(checkState);
 
-  if (!checkCreatePath) {
+  if (_.isEmpty(checkCreatePath)) {
     return;
   }
 
@@ -149,4 +151,6 @@ export const runPostActions = async ({ hexletToken }) => {
     const responseData = JSON.stringify(response, null, 2);
     throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
   }
+
+  core.info('The result of the assignment checking was successfully submitted.');
 };

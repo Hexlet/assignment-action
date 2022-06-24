@@ -86,8 +86,8 @@ it('run-tests assignment with incorrect path in .current.json', async () => {
 
 it('run-post-actions with success test state', async () => {
   const testsVariables = {
-    checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
-    checkState: JSON.stringify({ state: 'success' }),
+    STATE_checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkState: JSON.stringify({ state: 'success' }),
   };
 
   await expect(runPostActions(testsVariables)).resolves.not.toThrow();
@@ -95,8 +95,8 @@ it('run-post-actions with success test state', async () => {
 
 it('run-post-actions with fail test state', async () => {
   const testsVariables = {
-    checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
-    checkState: JSON.stringify({ state: 'fail' }),
+    STATE_checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkState: JSON.stringify({ state: 'fail' }),
   };
 
   await expect(runPostActions(testsVariables)).resolves.not.toThrow();
@@ -104,8 +104,8 @@ it('run-post-actions with fail test state', async () => {
 
 it('run-post-actions with incorrect test state', async () => {
   const testsVariables = {
-    checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
-    checkState: JSON.stringify({ state: 'invalid' }),
+    STATE_checkCreatePath: 'http://localhost:3000/api/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkState: JSON.stringify({ state: 'invalid' }),
   };
 
   await expect(runPostActions(testsVariables)).rejects.toThrow();
@@ -113,7 +113,7 @@ it('run-post-actions with incorrect test state', async () => {
 
 it('run-post-actions with previous stage failed', async () => {
   const testsVariables = {
-    checkState: JSON.stringify({ state: 'fail' }),
+    STATE_checkState: JSON.stringify({ state: 'fail' }),
   };
 
   await expect(runPostActions(testsVariables)).resolves.not.toThrow();
