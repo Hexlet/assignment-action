@@ -22,8 +22,9 @@ const params = {
 try {
   await runTests(params);
 } catch (e) {
-  const errorText = 'The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.';
-  console.error(colors.red(errorText));
+  console.error(
+    colors.red('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.'),
+  );
   console.error();
   console.error(buildErrorText(e));
 

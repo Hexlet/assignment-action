@@ -102,13 +102,12 @@ export const runTests = async (params) => {
   }
 
   const [courseSlugWithLocale, lessonSlug] = assignmentRelativePath.split('/');
-  const course = getCourseData(courseSlugWithLocale);
-  const routes = buildRoutes(course.slug, lessonSlug, course.locale, apiHost);
-  const link = routes.checkValidatePath;
-  const headers = { 'X-Auth-Key': hexletToken };
+  const courseData = getCourseData(courseSlugWithLocale);
+  const routes = buildRoutes(courseData.slug, lessonSlug, courseData.locale, apiHost);
 
+  const headers = { 'X-Auth-Key': hexletToken };
   const http = new HttpClient();
-  const response = await http.postJson(link, {}, headers);
+  const response = await http.postJson(routes.checkValidatePath, {}, headers);
 
   // NOTE: ответ 404 не вызывает ошибку клиента, потому обрабатываем вручную
   // https://github.com/actions/toolkit/tree/main/packages/http-client#http
@@ -125,6 +124,29 @@ export const runTests = async (params) => {
   const imageTag = _.get(response, 'result.version');
   const imageName = `hexletprograms/${courseSlugWithLocale}:${imageTag}`;
 
+  core.exportVariable('checkCreatePath', routes.checkCreatePath);
+  core.exportVariable('checkState', JSON.stringify({ state: 'fail' }));
+
   await prepareCourseDirectory({ verbose, coursePath, imageName });
   await checkAssignment({ assignmentPath, coursePath });
+
+  core.exportVariable('checkState', JSON.stringify({ state: 'success' }));
+};
+
+export const runPostActions = async ({ hexletToken }) => {
+  const { checkCreatePath, checkState } = process.env;
+
+  if (!checkCreatePath) {
+    return;
+  }
+
+  const headers = { 'X-Auth-Key': hexletToken };
+  const http = new HttpClient();
+  const response = await http.postJson(checkCreatePath, { check: checkState }, headers);
+
+  // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные
+  if (response.statusCode !== 201) {
+    const responseData = JSON.stringify(response, null, 2);
+    throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
+  }
 };
