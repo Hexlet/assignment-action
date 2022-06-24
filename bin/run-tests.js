@@ -2,7 +2,6 @@
 
 import core from '@actions/core';
 import path from 'path';
-import colors from 'ansi-colors';
 import { runTests, buildErrorText } from '../src/index.js';
 
 const verbose = core.getBooleanInput('verbose', { required: false });
@@ -22,15 +21,7 @@ const params = {
 try {
   await runTests(params);
 } catch (e) {
-  const errorText = [
-    colors.red('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.'),
-    '',
-    buildErrorText(e),
-  ].join('\n');
-  core.setFailed(errorText);
-
-  // NOTE: бектрейс экшена пользователям не нужен
-  if (verbose) {
-    throw e;
-  }
+  core.error('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.');
+  const errorText = verbose ? e : buildErrorText(e); // NOTE: бектрейс экшена пользователям не нужен
+  throw new Error(errorText);
 }
