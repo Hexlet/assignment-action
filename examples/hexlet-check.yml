@@ -22,4 +22,4 @@ jobs:
       - name: Hexlet assignment check
         uses: hexlet/assignment-action@release
         with:
-          hexlet-token: ${{ secrets.HEXLET_TOKEN }}
+          hexlet_token: ${{ secrets.HEXLET_TOKEN }}

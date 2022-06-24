@@ -34,8 +34,12 @@ beforeEach(async () => {
       env: {
         INPUT_VERBOSE: true,
         INPUT_MOUNT_PATH: tmpDirPath,
+        INPUT_HEXLET_TOKEN: 'some-token',
         ACTION_PROJECT_PATH: projectPath,
+        ACTION_API_HOST: 'localhost:3000',
         PATH: process.env.PATH,
+        // ACTIONS_STEP_DEBUG: true,
+        // NODE_DEBUG: 'http',
       },
     })
   );

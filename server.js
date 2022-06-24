@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 
-const userTokens = ['some_token'];
+const userTokens = ['some-token'];
 
 const latestCourseVersions = {
   'hexlet-course-source-ci': {
@@ -33,15 +33,13 @@ export default async (fastify, _options) => {
     const memberCourseVersion = _.get(memberCourseVersions, [courseSlug, lessonSlug]);
     const latestCourseVersion = _.get(latestCourseVersions, [courseSlug, lessonSlug]);
 
-    console.log(req.headers);
-
     if (!memberCourseVersion && !latestCourseVersion) {
       reply.code(404);
-      return { message: 'Assignment not found. Check the course and assignment directory names.' };
+      return { message: 'Assignment not found.' };
     }
 
     if (!memberCourseVersion) {
-      reply.code(404);
+      reply.code(422);
       return { message: 'You haven\'t started your assignment yet' };
     }
 

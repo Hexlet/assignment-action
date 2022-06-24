@@ -17,24 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # - run: make setup
-      # - run: node server.js &
+      - run: make setup
+      - run: make run-test-api-server &
       - uses: ./
-        # env:
-        #   NODE_DEBUG: http
-        #   ACTION_API_HOST: http://localhost:3000
-        #   ACTION_PROJECT_PATH: __fixtures__/project_source
-        # with:
-        #   hexlet-id: 1
-        #   verbose: true
-
-#   artifacts:
-#     needs: e2e
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: test-results
-#     - uses: actions/download-artifact@v2
-#       with:
-#         name: test-data
+        env:
+          ACTION_API_HOST: http://localhost:3000
+        with:
+          hexlet_token: 'some-token'

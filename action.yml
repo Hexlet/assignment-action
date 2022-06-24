@@ -2,9 +2,9 @@ name: 'Hexlet assignment action'
 description: 'For testing assignments'
 
 inputs:
-  # hexlet-id:
-  #   description: 'id'
-  #   required: true
+  hexlet_token:
+    description: 'Hexlet token'
+    required: true
   verbose:
     description: 'show extended output'
     required: false

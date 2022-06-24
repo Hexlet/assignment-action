@@ -9,12 +9,32 @@ import fs from 'fs';
 import StackTracey from 'stacktracey';
 import _ from 'lodash';
 import colors from 'ansi-colors';
+import { HttpClient } from '@actions/http-client';
+
+import buildRoutes from './routes.js';
 
 export const buildErrorText = (e) => {
   const stack = new StackTracey(e);
   const { message } = e;
   const traceLine = _.head(stack.items).beforeParse;
   return `${message}\n${traceLine}`;
+};
+
+const getCourseData = (slugWithLocale) => {
+  const availableLocales = ['ru'];
+
+  const slugParts = slugWithLocale.split('-');
+  const lastSlugPart = _.last(slugParts);
+
+  if (!availableLocales.includes(lastSlugPart)) {
+    return { locale: '', slug: slugWithLocale };
+  }
+
+  const replaceRegExp = new RegExp(`-${lastSlugPart}$`);
+  return {
+    locale: lastSlugPart,
+    slug: slugWithLocale.replace(replaceRegExp, ''),
+  };
 };
 
 const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
@@ -56,7 +76,13 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
 };
 
 export const runTests = async (params) => {
-  const { verbose, mountPath, projectPath } = params;
+  const {
+    verbose,
+    mountPath,
+    hexletToken,
+    projectPath,
+    apiHost,
+  } = params;
 
   const currentPath = path.join(projectPath, '.current.json');
   const coursePath = path.join(mountPath, 'course');
@@ -75,8 +101,29 @@ export const runTests = async (params) => {
     throw new Error(`Assignment by path ${assignmentRelativePath} not found. Check if the path is correct.`);
   }
 
-  // запрос на апи: проверка возможности тестирования, получение версии образа
-  const imageName = 'hexletprograms/hexlet-course-source-ci:release';
+  const [courseSlugWithLocale, lessonSlug] = assignmentRelativePath.split('/');
+  const course = getCourseData(courseSlugWithLocale);
+  const routes = buildRoutes(course.slug, lessonSlug, course.locale, apiHost);
+  const link = routes.checkValidatePath;
+  const headers = { 'X-Auth-Key': hexletToken };
+
+  const http = new HttpClient();
+  const response = await http.postJson(link, {}, headers);
+
+  // NOTE: ответ 404 не вызывает ошибку клиента, потому обрабатываем вручную
+  // https://github.com/actions/toolkit/tree/main/packages/http-client#http
+  if (response.statusCode === 404) {
+    throw new Error(`Assignment '${assignmentRelativePath}' not found. Check the course and assignment directory names.`);
+  }
+
+  // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные
+  if (response.statusCode !== 200) {
+    const responseData = JSON.stringify(response, null, 2);
+    throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
+  }
+
+  const imageTag = _.get(response, 'result.version');
+  const imageName = `hexletprograms/${courseSlugWithLocale}:${imageTag}`;
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
   await checkAssignment({ assignmentPath, coursePath });

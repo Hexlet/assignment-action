@@ -9,10 +9,12 @@ const verbose = core.getBooleanInput('verbose', { required: false });
 const mountPath = core.getInput('mount_path', { required: true });
 const apiHost = process.env.ACTION_API_HOST;
 const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
+const hexletToken = core.getInput('hexlet_token', { required: true });
 
 const params = {
   verbose,
   mountPath,
+  hexletToken,
   apiHost,
   projectPath,
 };
@@ -22,6 +24,7 @@ try {
 } catch (e) {
   const errorText = 'The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.';
   console.error(colors.red(errorText));
+  console.error();
   console.error(buildErrorText(e));
 
   // NOTE: бектрейс экшена пользователям не нужен

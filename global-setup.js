@@ -3,7 +3,7 @@ import { setup } from 'jest-dev-server';
 
 export default async () => {
   await setup({
-    command: 'fastify start server.js -l info -P',
+    command: 'make run-test-api-server',
     launchTimeout: 20000,
     port: 3000,
     debug: false,
