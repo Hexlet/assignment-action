@@ -23,5 +23,4 @@ jobs:
         env:
           ACTION_API_HOST: localhost:3000
         with:
-          hexlet_token: 'some-token1'
-          verbose: true
+          hexlet_token: 'some-token'
