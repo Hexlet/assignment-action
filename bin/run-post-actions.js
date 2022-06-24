@@ -13,7 +13,7 @@ const params = {
 try {
   await runPostActions(params);
 } catch (e) {
-  console.error(buildErrorText(e));
+  core.setFailed(buildErrorText(e));
 
   // NOTE: бектрейс экшена пользователям не нужен
   if (verbose) {

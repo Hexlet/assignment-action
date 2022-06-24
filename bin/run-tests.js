@@ -22,11 +22,12 @@ const params = {
 try {
   await runTests(params);
 } catch (e) {
-  console.error(
+  const errorText = [
     colors.red('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.'),
-  );
-  console.error();
-  console.error(buildErrorText(e));
+    '',
+    buildErrorText(e),
+  ].join('\n');
+  core.setFailed(errorText);
 
   // NOTE: бектрейс экшена пользователям не нужен
   if (verbose) {
