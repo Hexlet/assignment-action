@@ -21,7 +21,7 @@ const memberCourseVersions = {
 
 // eslint-disable-next-line
 export default async (fastify, _options) => {
-  fastify.get('/api/course/:courseSlug/lesson/:lessonSlug/assignment/check/validate', async (req, reply) => {
+  fastify.post('/api/course/:courseSlug/lesson/:lessonSlug/assignment/check/validate', async (req, reply) => {
     const { courseSlug, lessonSlug } = req.params;
     const token = req.headers['x-auth-key'];
 

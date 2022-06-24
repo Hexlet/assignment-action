@@ -6,6 +6,6 @@ export default async () => {
     command: 'fastify start server.js -l info -P',
     launchTimeout: 20000,
     port: 3000,
-    debug: true,
+    debug: false,
   });
 };
