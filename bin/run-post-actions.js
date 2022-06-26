@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 import core from '@actions/core';
-import { runPostActions, buildErrorText } from '../src/index.js';
+
+import { runPostActions } from '../src/index.js';
+import { buildErrorText } from '../src/utils.js';
 
 const verbose = core.getBooleanInput('verbose', { required: false });
 const hexletToken = core.getInput('hexlet_token', { required: true });

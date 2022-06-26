@@ -6,36 +6,12 @@ import { exec } from '@actions/exec';
 import path from 'path';
 import fse from 'fs-extra';
 import fs from 'fs';
-import StackTracey from 'stacktracey';
 import _ from 'lodash';
 import colors from 'ansi-colors';
 import { HttpClient } from '@actions/http-client';
 
 import buildRoutes from './routes.js';
-
-export const buildErrorText = (e) => {
-  const stack = new StackTracey(e);
-  const { message } = e;
-  const traceLine = _.head(stack.items).beforeParse;
-  return `${message}\n${traceLine}`;
-};
-
-const getCourseData = (slugWithLocale) => {
-  const availableLocales = ['ru'];
-
-  const slugParts = slugWithLocale.split('-');
-  const lastSlugPart = _.last(slugParts);
-
-  if (!availableLocales.includes(lastSlugPart)) {
-    return { locale: '', slug: slugWithLocale };
-  }
-
-  const replaceRegExp = new RegExp(`-${lastSlugPart}$`);
-  return {
-    locale: lastSlugPart,
-    slug: slugWithLocale.replace(replaceRegExp, ''),
-  };
-};
+import { getCourseData, getFullImageName } from './utils.js';
 
 const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   const cmdOptions = { silent: !verbose };
@@ -43,7 +19,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   await io.mkdirP(coursePath);
   await exec(`docker pull ${imageName}`, null, cmdOptions);
   await exec(
-    `docker run -v ${coursePath}:/mnt/course ${imageName} bash -c "cp -r /course/. /mnt/course"`,
+    `docker run --rm -v ${coursePath}:/mnt/course ${imageName} bash -c "cp -r /course/. /mnt/course"`,
     null,
     cmdOptions,
   );
@@ -52,7 +28,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   await exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
 
   await exec(
-    `docker compose -f docker-compose.yml run -v ${coursePath}:/course course make setup`,
+    `docker compose -f docker-compose.yml run --rm -v ${coursePath}:/course course make setup`,
     null,
     { ...cmdOptions, cwd: coursePath },
   );
@@ -68,7 +44,7 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
 
   core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
   await exec(
-    `docker compose -f docker-compose.yml run -v ${assignmentPath}:${assignmentDistPath} course make check-current ASSIGNMENT=${lessonName}`,
+    `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} course make check-current ASSIGNMENT=${lessonName}`,
     null,
     { cwd: coursePath },
   );
@@ -82,6 +58,7 @@ export const runTests = async (params) => {
     hexletToken,
     projectPath,
     apiHost,
+    containerNamespace,
   } = params;
 
   const currentPath = path.join(projectPath, '.current.json');
@@ -102,8 +79,8 @@ export const runTests = async (params) => {
   }
 
   const [courseSlugWithLocale, lessonSlug] = assignmentRelativePath.split('/');
-  const courseData = getCourseData(courseSlugWithLocale);
-  const routes = buildRoutes(courseData.slug, lessonSlug, courseData.locale, apiHost);
+  const { slug, locale } = getCourseData(courseSlugWithLocale);
+  const routes = buildRoutes(slug, lessonSlug, locale, apiHost);
 
   const headers = { 'X-Auth-Key': hexletToken };
   const http = new HttpClient();
@@ -122,7 +99,7 @@ export const runTests = async (params) => {
   }
 
   const imageTag = _.get(response, 'result.version');
-  const imageName = `hexletprograms/${courseSlugWithLocale}:${imageTag}`;
+  const imageName = getFullImageName(containerNamespace, slug, locale, imageTag);
 
   core.saveState('checkCreatePath', routes.checkCreatePath);
   core.saveState('checkState', JSON.stringify({ state: 'fail' }));

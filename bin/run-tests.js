@@ -2,13 +2,16 @@
 
 import core from '@actions/core';
 import path from 'path';
-import { runTests, buildErrorText } from '../src/index.js';
+
+import { runTests } from '../src/index.js';
+import { buildErrorText } from '../src/utils.js';
 
 const verbose = core.getBooleanInput('verbose', { required: false });
 const mountPath = core.getInput('mount_path', { required: true });
 const apiHost = process.env.ACTION_API_HOST;
 const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
 const hexletToken = core.getInput('hexlet_token', { required: true });
+const containerNamespace = 'hexletprograms';
 
 const params = {
   verbose,
@@ -16,6 +19,7 @@ const params = {
   hexletToken,
   apiHost,
   projectPath,
+  containerNamespace,
 };
 
 try {

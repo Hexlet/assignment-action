@@ -9,7 +9,7 @@ const buildUrl = (part, apiUrl, baseUrl) => {
 const buildBaseUrl = (locale, host) => {
   const [hostname] = host.split(':');
   const protocol = hostname === 'localhost' ? 'http' : 'https';
-  const hostPrefix = locale === '' ? '' : `${locale}.`;
+  const hostPrefix = locale === 'en' ? '' : `${locale}.`;
   return `${protocol}://${hostPrefix}${host}`;
 };
 
