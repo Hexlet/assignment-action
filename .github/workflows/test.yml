@@ -8,7 +8,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make setup
       - run: make test
       - run: make lint
@@ -16,7 +16,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make setup
       - run: make run-test-api-server &
       - uses: ./
