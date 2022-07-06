@@ -5,7 +5,6 @@ import path from 'path';
 import cleanStack from 'clean-stack';
 
 import { runTests } from '../src/index.js';
-import { buildErrorText } from '../src/utils.js';
 
 const verbose = core.getBooleanInput('verbose', { required: false });
 const mountPath = core.getInput('mount_path', { required: true });

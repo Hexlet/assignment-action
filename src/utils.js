@@ -1,7 +1,6 @@
 // @ts-check
 
 import _ from 'lodash';
-import StackTracey from 'stacktracey';
 
 const availableLocales = ['ru'];
 
