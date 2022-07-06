@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import core from '@actions/core';
+import cleanStack from 'clean-stack';
 
 import { runPostActions } from '../src/index.js';
 import { buildErrorText } from '../src/utils.js';
@@ -15,6 +16,9 @@ const params = {
 try {
   await runPostActions(params);
 } catch (e) {
-  const errorText = verbose ? e : buildErrorText(e); // NOTE: бектрейс экшена пользователям не нужен
-  throw new Error(errorText);
+  // NOTE: бектрейс экшена пользователям не нужен
+  if (!verbose) {
+    e.stack = cleanStack(e.stack);
+  }
+  throw e;
 }

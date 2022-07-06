@@ -2,6 +2,7 @@
 
 import core from '@actions/core';
 import path from 'path';
+import cleanStack from 'clean-stack';
 
 import { runTests } from '../src/index.js';
 import { buildErrorText } from '../src/utils.js';
@@ -26,6 +27,9 @@ try {
   await runTests(params);
 } catch (e) {
   core.error('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.');
-  const errorText = verbose ? e : buildErrorText(e); // NOTE: бектрейс экшена пользователям не нужен
-  throw new Error(errorText);
+  // NOTE: бектрейс экшена пользователям не нужен
+  if (!verbose) {
+    e.stack = cleanStack(e.stack);
+  }
+  throw e;
 }
