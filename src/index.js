@@ -19,7 +19,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   await io.mkdirP(coursePath);
   await exec(`docker pull ${imageName}`, null, cmdOptions);
   await exec(
-    `docker run --rm -v ${coursePath}:/mnt/course ${imageName} bash -c "cp -r /course/. /mnt/course"`,
+    `docker run --rm -v ${coursePath}:/mnt/course ${imageName} bash -c "cp -r /project/course/. /mnt/course"`,
     null,
     cmdOptions,
   );
@@ -28,7 +28,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   await exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
 
   await exec(
-    `docker compose -f docker-compose.yml run --rm -v ${coursePath}:/course course make setup`,
+    `docker compose -f docker-compose.yml run --rm -v ${coursePath}:/project/course project make setup`,
     null,
     { ...cmdOptions, cwd: coursePath },
   );
@@ -40,11 +40,11 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
 
   const assignmentName = path.basename(assignmentPath);
   const lessonName = mappingData[assignmentName];
-  const assignmentDistPath = path.join('/', 'course', lessonName, 'assignment');
+  const assignmentDistPath = path.join('/', 'project', 'course', lessonName, 'assignment');
 
   core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
   await exec(
-    `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} course make check-current ASSIGNMENT=${lessonName}`,
+    `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make check-current ASSIGNMENT=${lessonName}`,
     null,
     { cwd: coursePath },
   );
