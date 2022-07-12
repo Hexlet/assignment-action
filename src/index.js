@@ -24,7 +24,7 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
     cmdOptions,
   );
 
-  const composeImageName = `${path.basename(coursePath)}_course`;
+  const composeImageName = `${path.basename(coursePath)}_project`;
   await exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
 
   await exec(
