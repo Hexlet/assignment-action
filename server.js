@@ -48,7 +48,7 @@ export default async (fastify, _options) => {
     })
     .post('/api/course/:courseSlug/lesson/:lessonSlug/assignment/check', async (req, reply) => {
       const { check } = req.body;
-      const { state } = JSON.parse(check);
+      const { state } = check;
 
       if (state !== 'fail' && state !== 'success') {
         reply.code(422);

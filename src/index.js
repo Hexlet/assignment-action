@@ -112,7 +112,7 @@ export const runTests = async (params) => {
 
 export const runPostActions = async ({ hexletToken }) => {
   const checkCreatePath = core.getState('checkCreatePath');
-  const checkState = core.getState('checkState');
+  const checkState = JSON.parse(core.getState('checkState'));
 
   if (_.isEmpty(checkCreatePath)) {
     return;
