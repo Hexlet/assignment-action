@@ -24,8 +24,10 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
     cmdOptions,
   );
 
-  const composeImageName = `${path.basename(coursePath)}_project`;
-  await exec(`docker tag ${imageName} ${composeImageName}`, null, cmdOptions);
+  const dirName = path.basename(coursePath);
+  await exec(`docker tag ${imageName} ${dirName}_project`, null, cmdOptions);
+  // NOTE: на гитхаб дефолтное имя образа для compose почему то отличается
+  await exec(`docker tag ${imageName} ${dirName}-project`, null, cmdOptions);
 
   await exec(
     `docker compose -f docker-compose.yml run --rm -v ${coursePath}:/project/course project make setup`,
