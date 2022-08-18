@@ -6,9 +6,6 @@ import cleanStack from 'clean-stack';
 
 import { runTests } from '../src/index.js';
 
-core.exportVariable('COMPOSE_DOCKER_CLI_BUILD', 1);
-core.exportVariable('DOCKER_BUILDKIT', 1);
-
 const verbose = core.getBooleanInput('verbose', { required: false });
 const mountPath = core.getInput('mount_path', { required: true });
 const apiHost = process.env.ACTION_API_HOST;

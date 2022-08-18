@@ -4,17 +4,16 @@ on:
   - push
   - pull_request
 
-jobs:
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: make setup
-      - run: make test
-      - run: make lint
+# jobs:
+#   tests:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - run: make setup
+#       - run: make test
+#       - run: make lint
 
   e2e:
-    needs: tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -25,3 +24,4 @@ jobs:
           ACTION_API_HOST: localhost:3000
         with:
           hexlet_token: 'some-token'
+          verbose: true
