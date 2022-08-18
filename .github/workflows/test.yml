@@ -22,6 +22,8 @@ jobs:
       - uses: ./
         env:
           ACTION_API_HOST: localhost:3000
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          DOCKER_BUILDKIT: 1
         with:
           hexlet_token: 'some-token'
           verbose: true
