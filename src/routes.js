@@ -15,7 +15,7 @@ const buildBaseUrl = (locale, host) => {
 
 const buildRoutes = (courseSlug, lessonSlug, locale, host = 'hexlet.io') => {
   const baseUrl = buildBaseUrl(locale, host);
-  const apiUrl = `/api/course/${courseSlug}/lesson/${lessonSlug}/assignment`;
+  const apiUrl = `/api_internal/course/${courseSlug}/lesson/${lessonSlug}/assignment`;
 
   return {
     checkValidatePath: buildUrl('check/validate', apiUrl, baseUrl),
