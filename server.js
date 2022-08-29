@@ -46,7 +46,7 @@ export default async (fastify, _options) => {
 
       return { version: memberCourseVersion };
     })
-    .post('/api/course/:courseSlug/lesson/:lessonSlug/assignment/check', async (req, reply) => {
+    .post('/api_internal/course/:courseSlug/lesson/:lessonSlug/assignment/check', async (req, reply) => {
       const { check } = req.body;
       const { state } = check;
 
