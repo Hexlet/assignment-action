@@ -22,7 +22,7 @@ const memberCourseVersions = {
 // eslint-disable-next-line
 export default async (fastify, _options) => {
   fastify
-    .post('/api_internal/course/:courseSlug/lesson/:lessonSlug/assignment/check/validate', async (req, reply) => {
+    .post('/api_internal/courses/:courseSlug/lessons/:lessonSlug/assignment/check/validate', async (req, reply) => {
       const { courseSlug, lessonSlug } = req.params;
       const token = req.headers['x-auth-key'];
 
@@ -46,7 +46,7 @@ export default async (fastify, _options) => {
 
       return { version: memberCourseVersion };
     })
-    .post('/api_internal/course/:courseSlug/lesson/:lessonSlug/assignment/check', async (req, reply) => {
+    .post('/api_internal/courses/:courseSlug/lessons/:lessonSlug/assignment/check', async (req, reply) => {
       const { check } = req.body;
       const { state } = check;
 

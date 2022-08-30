@@ -86,7 +86,7 @@ it('run-tests assignment with incorrect path in .current.json', async () => {
 
 it('run-post-actions with success test state', async () => {
   const testsVariables = {
-    STATE_checkCreatePath: 'http://localhost:3000/api_internal/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkCreatePath: 'http://localhost:3000/api_internal/courses/hexlet-course-source-ci/lessons/basics/assignment/check',
     STATE_checkState: JSON.stringify({ state: 'success' }),
   };
 
@@ -95,7 +95,7 @@ it('run-post-actions with success test state', async () => {
 
 it('run-post-actions with fail test state', async () => {
   const testsVariables = {
-    STATE_checkCreatePath: 'http://localhost:3000/api_internal/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkCreatePath: 'http://localhost:3000/api_internal/courses/hexlet-course-source-ci/lessons/basics/assignment/check',
     STATE_checkState: JSON.stringify({ state: 'fail' }),
   };
 
@@ -104,7 +104,7 @@ it('run-post-actions with fail test state', async () => {
 
 it('run-post-actions with incorrect test state', async () => {
   const testsVariables = {
-    STATE_checkCreatePath: 'http://localhost:3000/api_internal/course/hexlet-course-source-ci/lesson/basics/assignment/check',
+    STATE_checkCreatePath: 'http://localhost:3000/api_internal/courses/hexlet-course-source-ci/lessons/basics/assignment/check',
     STATE_checkState: JSON.stringify({ state: 'invalid' }),
   };
 
