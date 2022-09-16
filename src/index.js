@@ -114,11 +114,12 @@ export const runTests = async (params) => {
 
 export const runPostActions = async ({ hexletToken }) => {
   const checkCreatePath = core.getState('checkCreatePath');
-  const checkState = JSON.parse(core.getState('checkState'));
 
   if (_.isEmpty(checkCreatePath)) {
     return;
   }
+
+  const checkState = JSON.parse(core.getState('checkState'));
 
   const headers = { 'X-Auth-Key': hexletToken };
   const http = new HttpClient();
