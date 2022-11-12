@@ -57,7 +57,9 @@ const runChecking = async (task, options) => {
       { cwd: coursePath, listeners },
     );
     success = true;
-    core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
+    if (task === 'test') {
+      core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
+    }
   } catch (e) {
     success = false;
     exception = e;
@@ -81,8 +83,8 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
   const options = {
     coursePath, assignmentPath, assignmentDistPath, lessonName, assignmentName,
   };
-  const testingData = await core.group('Testing', () => runTesting(options));
-  const lintingData = await core.group('Linting', () => runLinting(options));
+  const testingData = await runTesting(options);
+  const lintingData = await runLinting(options);
 
   // save data here and pass to post action
 
