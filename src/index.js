@@ -49,21 +49,29 @@ const runChecking = async (task, options) => {
 
   let success;
   let exception;
+
   try {
-    core.info(colors.yellow(`${taskToAction[task]} assignment "${assignmentName}" started`));
+    const startingMessage = `${taskToAction[task]} assignment "${assignmentName}" started`;
+    core.info('='.repeat(startingMessage.length));
+    core.info(colors.yellow(startingMessage));
+
     await exec(
       `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make ${task}-current ASSIGNMENT=${lessonName}`,
       null,
       { cwd: coursePath, listeners },
     );
     success = true;
-    if (task === 'test') {
-      core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
-    }
+
+    const finishingMessage = `${taskToAction[task]} assignment "${assignmentName}" completed successfully`;
+    core.info(colors.green(finishingMessage));
+    core.info('='.repeat(finishingMessage.length));
   } catch (e) {
     success = false;
     exception = e;
-    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed`));
+
+    const failingMessage = `${taskToAction[task]} assignment "${assignmentName}" failed`;
+    core.info(colors.red(failingMessage));
+    core.info('='.repeat(failingMessage.length));
   }
 
   return { output: outputParts.join(''), success, exception };
