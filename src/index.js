@@ -36,6 +36,40 @@ const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   );
 };
 
+const runChecking = async (task, options) => {
+  const {
+    coursePath, assignmentPath, assignmentDistPath, lessonName, assignmentName,
+  } = options;
+
+  const outputParts = [];
+  const addToOutputParts = (data) => outputParts.push(data.toString());
+  const listeners = { stdout: addToOutputParts, stderr: addToOutputParts };
+
+  const taskToAction = { test: 'Testing', lint: 'Linting' };
+
+  let success;
+  let exception;
+  try {
+    core.info(colors.yellow(`${taskToAction[task]} assignment "${assignmentName}" started`));
+    await exec(
+      `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make ${task}-current ASSIGNMENT=${lessonName}`,
+      null,
+      { cwd: coursePath, listeners },
+    );
+    success = true;
+    core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
+  } catch (e) {
+    success = false;
+    exception = e;
+    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed`));
+  }
+
+  return { output: outputParts.join(''), success, exception };
+};
+
+const runTesting = (options) => runChecking('test', options);
+const runLinting = (options) => runChecking('lint', options);
+
 const checkAssignment = async ({ assignmentPath, coursePath }) => {
   const mappingDataPath = path.join(coursePath, 'mappingData.json');
   const mappingData = await fse.readJSON(mappingDataPath);
@@ -44,13 +78,25 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
   const lessonName = mappingData[assignmentName];
   const assignmentDistPath = path.join('/', 'project', 'course', lessonName, 'assignment');
 
-  core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
-  await exec(
-    `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make check-current ASSIGNMENT=${lessonName}`,
-    null,
-    { cwd: coursePath },
-  );
-  core.info(colors.green(`Checking assignment ${assignmentName} successful completed`));
+  const options = {
+    coursePath, assignmentPath, assignmentDistPath, lessonName, assignmentName,
+  };
+  const testingData = await core.group('Testing', () => runTesting(options));
+  const lintingData = await core.group('Linting', () => runLinting(options));
+
+  // save data here and pass to post action
+
+  if (!testingData.success) {
+    throw testingData.exception;
+  }
+
+  // core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
+  // await exec(
+  //   `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make test-current ASSIGNMENT=${lessonName}`,
+  //   null,
+  //   { cwd: coursePath },
+  // );
+  // core.info(colors.green(`Checking assignment ${assignmentName} successful completed`));
 };
 
 export const runTests = async (params) => {
