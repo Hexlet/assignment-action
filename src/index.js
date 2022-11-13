@@ -51,17 +51,17 @@ const runChecking = async (task, options) => {
   let exception = null;
 
   try {
-    core.info(colors.yellow(`${taskToAction[task]} assignment "${assignmentName}" started`));
+    core.info(colors.yellow(`${taskToAction[task]} assignment "${assignmentName}" started.`));
     await exec(
       `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make ${task}-current ASSIGNMENT=${lessonName}`,
       null,
       { cwd: coursePath, listeners },
     );
     passed = true;
-    core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
+    core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully.`));
   } catch (e) {
     exception = e;
-    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed`));
+    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed.`));
   }
 
   core.info('─'.repeat(40));
@@ -176,5 +176,5 @@ export const runPostActions = async ({ hexletToken }) => {
     throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
   }
 
-  core.info(colors.cyan('The result of the assignment checking was successfully submitted.'));
+  core.info(colors.cyan('The result of the assignment checking has submitted successfully.'));
 };
