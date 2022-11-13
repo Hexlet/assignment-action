@@ -47,34 +47,26 @@ const runChecking = async (task, options) => {
 
   const taskToAction = { test: 'Testing', lint: 'Linting' };
 
-  let success;
-  let exception;
+  let passed = false;
+  let exception = null;
 
   try {
-    const startingMessage = `${taskToAction[task]} assignment "${assignmentName}" started`;
-    core.info('='.repeat(startingMessage.length));
-    core.info(colors.yellow(startingMessage));
-
+    core.info(colors.yellow(`${taskToAction[task]} assignment "${assignmentName}" started`));
     await exec(
       `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make ${task}-current ASSIGNMENT=${lessonName}`,
       null,
       { cwd: coursePath, listeners },
     );
-    success = true;
-
-    const finishingMessage = `${taskToAction[task]} assignment "${assignmentName}" completed successfully`;
-    core.info(colors.green(finishingMessage));
-    core.info('='.repeat(finishingMessage.length));
+    passed = true;
+    core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully`));
   } catch (e) {
-    success = false;
     exception = e;
-
-    const failingMessage = `${taskToAction[task]} assignment "${assignmentName}" failed`;
-    core.info(colors.red(failingMessage));
-    core.info('='.repeat(failingMessage.length));
+    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed`));
   }
 
-  return { output: outputParts.join(''), success, exception };
+  core.info('─'.repeat(40));
+
+  return { output: outputParts.join(''), passed, exception };
 };
 
 const runTesting = (options) => runChecking('test', options);
@@ -91,22 +83,10 @@ const checkAssignment = async ({ assignmentPath, coursePath }) => {
   const options = {
     coursePath, assignmentPath, assignmentDistPath, lessonName, assignmentName,
   };
-  const testingData = await runTesting(options);
-  const lintingData = await runLinting(options);
+  const testData = await runTesting(options);
+  const lintData = await runLinting(options);
 
-  // save data here and pass to post action
-
-  if (!testingData.success) {
-    throw testingData.exception;
-  }
-
-  // core.info(colors.yellow(`Checking assignment ${assignmentName} started`));
-  // await exec(
-  //   `docker compose -f docker-compose.yml run --rm -v ${assignmentPath}:${assignmentDistPath} project make test-current ASSIGNMENT=${lessonName}`,
-  //   null,
-  //   { cwd: coursePath },
-  // );
-  // core.info(colors.green(`Checking assignment ${assignmentName} successful completed`));
+  return { testData, lintData };
 };
 
 export const runTests = async (params) => {
@@ -163,12 +143,19 @@ export const runTests = async (params) => {
   core.saveState('checkState', JSON.stringify({ state: 'fail' }));
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
-  await checkAssignment({ assignmentPath, coursePath });
+  const checkData = await checkAssignment({ assignmentPath, coursePath });
+
+  core.saveState('checkData', JSON.stringify({ checkData }));
+
+  const { testData } = checkData;
+  // NOTE: важен только результат запуска тестов. Проверка линтером не должна вызывать ошибку.
+  if (!testData.passed) {
+    throw testData.exception;
+  }
 
   core.saveState('checkState', JSON.stringify({ state: 'success' }));
 };
 
-/* eslint-disable */
 export const runPostActions = async ({ hexletToken }) => {
   const checkCreatePath = core.getState('checkCreatePath');
 
@@ -177,17 +164,17 @@ export const runPostActions = async ({ hexletToken }) => {
   }
 
   const checkState = JSON.parse(core.getState('checkState'));
+  // const checkData = core.getState('checkData');
 
-  // const headers = { 'X-Auth-Key': hexletToken };
-  // const http = new HttpClient();
-  // const response = await http.postJson(checkCreatePath, { check: checkState }, headers);
+  const headers = { 'X-Auth-Key': hexletToken };
+  const http = new HttpClient();
+  const response = await http.postJson(checkCreatePath, { check: checkState }, headers);
 
-  // // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные
-  // if (response.statusCode !== 201) {
-  //   const responseData = JSON.stringify(response, null, 2);
-  //   throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
-  // }
+  // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные
+  if (response.statusCode !== 201) {
+    const responseData = JSON.stringify(response, null, 2);
+    throw new Error(`An unrecognized connection error has occurred. Please report to support.\n${responseData}`);
+  }
 
   core.info(colors.cyan('The result of the assignment checking was successfully submitted.'));
 };
-/* eslint-enable */
