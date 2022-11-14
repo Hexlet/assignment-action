@@ -83,8 +83,8 @@ describe('run-tests assignment', () => {
 describe('run-post-actions', () => {
   const checkCreatePath = 'http://localhost:3000/api_internal/courses/hexlet-course-source-ci/lessons/basics/assignment/check';
   const checkData = {
-    testData: { passed: true, output: 'some testing output' },
-    lintData: { passed: false, output: 'some linting output' },
+    testData: { passed: true, output: 'some testing output', exception: null },
+    lintData: { passed: false, output: 'some linting output', exception: new Error('linting failed') },
   };
 
   it('success test state', async () => {
