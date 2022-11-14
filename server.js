@@ -41,7 +41,7 @@ const checkSchema = {
         output: { type: 'string', minLength: 1 },
       },
       required: ['passed', 'output'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
   },
   required: ['state', 'testData', 'lintData'],

@@ -162,6 +162,7 @@ export const runPostActions = async ({ hexletToken }) => {
   const checkDataContent = core.getState('checkData');
 
   if (_.isEmpty(checkDataContent)) {
+    core.info(colors.cyan('The testing hasn\'t started. No data to send.'));
     return;
   }
 
