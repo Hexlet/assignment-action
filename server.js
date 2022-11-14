@@ -45,8 +45,10 @@ const checkSchema = {
       required: ['passed', 'output', 'exception'],
       additionalProperties: false,
     },
+    sourceContents: { type: 'object' },
+    testContents: { type: 'object' },
   },
-  required: ['state', 'testData', 'lintData'],
+  required: ['state', 'testData', 'lintData', 'sourceContents', 'testContents'],
   additionalProperties: false,
 };
 

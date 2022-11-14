@@ -11,7 +11,9 @@ import colors from 'ansi-colors';
 import { HttpClient } from '@actions/http-client';
 
 import buildRoutes from './routes.js';
-import { getCourseData, getFullImageName } from './utils.js';
+import {
+  getCourseData, getFullImageName, getFilesData, getAssignmentContents,
+} from './utils.js';
 
 const prepareCourseDirectory = async ({ verbose, coursePath, imageName }) => {
   const cmdOptions = { silent: !verbose };
@@ -143,8 +145,11 @@ export const runTests = async (params) => {
   core.saveState('checkState', 'fail');
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
-  const checkData = await checkAssignment({ assignmentPath, coursePath });
+  const filesData = await getFilesData(coursePath, lessonSlug);
+  core.saveState('filesData', JSON.stringify(filesData));
+  core.saveState('assignmentPath', assignmentPath);
 
+  const checkData = await checkAssignment({ assignmentPath, coursePath });
   core.saveState('checkData', JSON.stringify(checkData));
 
   const { testData } = checkData;
@@ -157,20 +162,26 @@ export const runTests = async (params) => {
 };
 
 export const runPostActions = async ({ hexletToken }) => {
-  const checkCreatePath = core.getState('checkCreatePath');
-  const checkState = core.getState('checkState');
   const checkDataContent = core.getState('checkData');
 
+  // NOTE: в таком случае экшн отработал с непредвиденными ошибками до запуска тестов
+  // дальнейшая нормальная работа экшна невозможна
   if (_.isEmpty(checkDataContent)) {
-    core.info(colors.cyan('The testing hasn\'t started. No data to send.'));
+    core.info(colors.cyan('The assignment checking hasn\'t started. No data to send.'));
     return;
   }
 
+  const checkCreatePath = core.getState('checkCreatePath');
+  const checkState = core.getState('checkState');
+  const filesData = JSON.parse(core.getState('filesData'));
+  const assignmentPath = core.getState('assignmentPath');
+
   const checkData = JSON.parse(checkDataContent);
+  const assignmentContents = await getAssignmentContents(assignmentPath, filesData);
 
   const http = new HttpClient();
   const headers = { 'X-Auth-Key': hexletToken };
-  const body = { check: { ...checkData, state: checkState } };
+  const body = { check: { ...checkData, ...assignmentContents, state: checkState } };
   const response = await http.postJson(checkCreatePath, body, headers);
 
   // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные

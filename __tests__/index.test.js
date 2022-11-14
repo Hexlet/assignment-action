@@ -86,34 +86,56 @@ describe('run-post-actions', () => {
     testData: { passed: true, output: 'some testing output', exception: null },
     lintData: { passed: false, output: 'some linting output', exception: new Error('linting failed') },
   };
+  const assignmentRelativePath = 'hexlet-course-source-ci/basics';
+  const filesData = {
+    sourceFiles: ['src/main/java/exercise/App.java'],
+    testFiles: ['src/test/java/exercise/AppTest.java'],
+  };
 
   it('success test state', async () => {
-    env.STATE_checkCreatePath = checkCreatePath;
-    env.STATE_checkState = 'success';
-    env.STATE_checkData = JSON.stringify(checkData);
+    const states = {
+      STATE_checkCreatePath: checkCreatePath,
+      STATE_checkState: 'success',
+      STATE_checkData: JSON.stringify(checkData),
+      STATE_assignmentPath: path.join(env.ACTION_PROJECT_PATH, assignmentRelativePath),
+      STATE_filesData: JSON.stringify(filesData),
+    };
 
-    await expect(runPostActions(env)).resolves.not.toThrow();
+    await expect(runPostActions({ ...env, ...states })).resolves.not.toThrow();
   });
 
   it('fail test state', async () => {
-    env.STATE_checkCreatePath = checkCreatePath;
-    env.STATE_checkState = 'fail';
-    env.STATE_checkData = JSON.stringify(checkData);
+    const states = {
+      STATE_checkCreatePath: checkCreatePath,
+      STATE_checkState: 'fail',
+      STATE_checkData: JSON.stringify(checkData),
+      STATE_assignmentPath: path.join(env.ACTION_PROJECT_PATH, assignmentRelativePath),
+      STATE_filesData: JSON.stringify(filesData),
+    };
 
-    await expect(runPostActions(env)).resolves.not.toThrow();
+    await expect(runPostActions({ ...env, ...states })).resolves.not.toThrow();
   });
 
   it('incorrect test state', async () => {
-    env.STATE_checkCreatePath = checkCreatePath;
-    env.STATE_checkState = 'invalid';
-    env.STATE_checkData = JSON.stringify(checkData);
+    const states = {
+      STATE_checkCreatePath: checkCreatePath,
+      STATE_checkState: 'invalid',
+      STATE_checkData: JSON.stringify(checkData),
+      STATE_assignmentPath: path.join(env.ACTION_PROJECT_PATH, assignmentRelativePath),
+      STATE_filesData: JSON.stringify(filesData),
+    };
 
-    await expect(runPostActions(env)).rejects.toThrow();
+    await expect(runPostActions({ ...env, ...states })).rejects.toThrow();
   });
 
   it('previous stage failed before testing', async () => {
-    env.STATE_checkState = 'fail';
+    const states = {
+      STATE_checkCreatePath: checkCreatePath,
+      STATE_checkState: 'fail',
+      STATE_assignmentPath: path.join(env.ACTION_PROJECT_PATH, assignmentRelativePath),
+      STATE_filesData: JSON.stringify(filesData),
+    };
 
-    await expect(runPostActions(env)).resolves.not.toThrow();
+    await expect(runPostActions({ ...env, ...states })).resolves.not.toThrow();
   });
 });
