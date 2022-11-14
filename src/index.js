@@ -61,7 +61,7 @@ const runChecking = async (task, options) => {
     core.info(colors.green(`${taskToAction[task]} assignment "${assignmentName}" completed successfully.`));
   } catch (e) {
     exception = e;
-    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" failed.`));
+    core.info(colors.red(`${taskToAction[task]} assignment "${assignmentName}" completed with errors.`));
   }
 
   core.info('─'.repeat(40));
@@ -140,12 +140,12 @@ export const runTests = async (params) => {
   const imageName = getFullImageName(containerNamespace, slug, locale, imageTag);
 
   core.saveState('checkCreatePath', routes.checkCreatePath);
-  core.saveState('checkState', JSON.stringify({ state: 'fail' }));
+  core.saveState('checkState', 'fail');
 
   await prepareCourseDirectory({ verbose, coursePath, imageName });
   const checkData = await checkAssignment({ assignmentPath, coursePath });
 
-  core.saveState('checkData', JSON.stringify({ checkData }));
+  core.saveState('checkData', JSON.stringify(checkData));
 
   const { testData } = checkData;
   // NOTE: важен только результат запуска тестов. Проверка линтером не должна вызывать ошибку.
@@ -153,22 +153,24 @@ export const runTests = async (params) => {
     throw testData.exception;
   }
 
-  core.saveState('checkState', JSON.stringify({ state: 'success' }));
+  core.saveState('checkState', 'success');
 };
 
 export const runPostActions = async ({ hexletToken }) => {
   const checkCreatePath = core.getState('checkCreatePath');
+  const checkState = core.getState('checkState');
+  const checkDataContent = core.getState('checkData');
 
-  if (_.isEmpty(checkCreatePath)) {
+  if (_.isEmpty(checkDataContent)) {
     return;
   }
 
-  const checkState = JSON.parse(core.getState('checkState'));
-  // const checkData = core.getState('checkData');
+  const checkData = JSON.parse(checkDataContent);
 
-  const headers = { 'X-Auth-Key': hexletToken };
   const http = new HttpClient();
-  const response = await http.postJson(checkCreatePath, { check: checkState }, headers);
+  const headers = { 'X-Auth-Key': hexletToken };
+  const body = { check: { ...checkData, state: checkState } };
+  const response = await http.postJson(checkCreatePath, body, headers);
 
   // NOTE: любые ответы которые не вызвали падение клиента и не являются успешными - неизвестные
   if (response.statusCode !== 201) {

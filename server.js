@@ -1,6 +1,8 @@
 // @ts-check
 
 import _ from 'lodash';
+// eslint-disable-next-line
+import Ajv from 'ajv';
 
 const userTokens = ['some-token'];
 
@@ -17,6 +19,33 @@ const memberCourseVersions = {
     basics: 'release',
     'first-program': 'release',
   },
+};
+
+const checkSchema = {
+  type: 'object',
+  properties: {
+    state: { enum: ['fail', 'success'] },
+    testData: {
+      type: 'object',
+      properties: {
+        passed: { type: 'boolean' },
+        output: { type: 'string', minLength: 1 },
+      },
+      required: ['passed', 'output'],
+      additionalProperties: true,
+    },
+    lintData: {
+      type: 'object',
+      properties: {
+        passed: { type: 'boolean' },
+        output: { type: 'string', minLength: 1 },
+      },
+      required: ['passed', 'output'],
+      additionalProperties: false,
+    },
+  },
+  required: ['state', 'testData', 'lintData'],
+  additionalProperties: false,
 };
 
 // eslint-disable-next-line
@@ -48,11 +77,13 @@ export default async (fastify, _options) => {
     })
     .post('/api_internal/courses/:courseSlug/lessons/:lessonSlug/assignment/check', async (req, reply) => {
       const { check } = req.body;
-      const { state } = check;
 
-      if (state !== 'fail' && state !== 'success') {
+      const ajv = new Ajv();
+      const validate = ajv.compile(checkSchema);
+
+      if (!validate(check)) {
         reply.code(422);
-        return { message: 'Invalid check state value. Please report to support.' };
+        return { message: 'Invalid check schema. Please report to support.' };
       }
 
       reply.code(201);
