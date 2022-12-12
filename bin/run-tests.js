@@ -12,6 +12,7 @@ const apiHost = process.env.ACTION_API_HOST;
 const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
 const hexletToken = core.getInput('hexlet_token', { required: true });
 const containerNamespace = 'hexletprograms';
+const authSecret = process.env.AUTH_SECRET;
 
 const params = {
   verbose,
@@ -20,6 +21,7 @@ const params = {
   apiHost,
   projectPath,
   containerNamespace,
+  authSecret,
 };
 
 try {

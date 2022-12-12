@@ -99,6 +99,7 @@ export const runTests = async (params) => {
     projectPath,
     apiHost,
     containerNamespace,
+    authSecret,
   } = params;
 
   const currentPath = path.join(projectPath, '.current.json');
@@ -122,7 +123,7 @@ export const runTests = async (params) => {
   const { slug, locale } = getCourseData(courseSlugWithLocale);
   const routes = buildRoutes(slug, lessonSlug, locale, apiHost);
 
-  const headers = { 'X-Auth-Key': hexletToken };
+  const headers = { 'X-Auth-Key': hexletToken, 'Authorization': authSecret };
   const http = new HttpClient();
   const response = await http.postJson(routes.checkValidatePath, {}, headers);
 
@@ -161,7 +162,7 @@ export const runTests = async (params) => {
   core.saveState('checkState', 'success');
 };
 
-export const runPostActions = async ({ hexletToken }) => {
+export const runPostActions = async ({ hexletToken, authSecret }) => {
   const checkDataContent = core.getState('checkData');
 
   // NOTE: в таком случае экшн отработал с непредвиденными ошибками до запуска тестов
@@ -180,7 +181,7 @@ export const runPostActions = async ({ hexletToken }) => {
   const assignmentContents = await getAssignmentContents(assignmentPath, filesData);
 
   const http = new HttpClient();
-  const headers = { 'X-Auth-Key': hexletToken };
+  const headers = { 'X-Auth-Key': hexletToken, 'Authorization': authSecret };
   const body = { check: { ...checkData, ...assignmentContents, state: checkState } };
   const response = await http.postJson(checkCreatePath, body, headers);
 

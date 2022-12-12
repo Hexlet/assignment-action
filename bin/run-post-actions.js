@@ -7,9 +7,11 @@ import { runPostActions } from '../src/index.js';
 
 const verbose = core.getBooleanInput('verbose', { required: false });
 const hexletToken = core.getInput('hexlet_token', { required: true });
+const authSecret = process.env.AUTH_SECRET;
 
 const params = {
   hexletToken,
+  authSecret,
 };
 
 try {
